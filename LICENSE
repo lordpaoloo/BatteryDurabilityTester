@@ -1,24 +1,18 @@
-This is free and unencumbered software released into the public domain.
+Battery Durability Tester - Proprietary License
 
-Anyone is free to copy, modify, publish, use, compile, sell, or
-distribute this software, either in source code form or as a compiled
-binary, for any purpose, commercial or non-commercial, and by any
-means.
+Copyright (c) 2024 Yousef Mohamad
 
-In jurisdictions that recognize copyright laws, the author or authors
-of this software dedicate any and all copyright interest in the
-software to the public domain. We make this dedication for the benefit
-of the public at large and to the detriment of our heirs and
-successors. We intend this dedication to be an overt act of
-relinquishment in perpetuity of all present and future rights to this
-software under copyright law.
+Permission is hereby granted, free of charge, to use the software for personal, non-commercial use only. 
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
+The software is provided "as-is" and without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, or non-infringement. In no event shall the authors or copyright holders be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.
 
-For more information, please refer to <https://unlicense.org>
+### Restrictions:
+1. You are not allowed to modify, distribute, or sell the software.
+2. You are not allowed to reverse-engineer, decompile, or disassemble the software.
+3. You may not use the software for commercial purposes without obtaining prior written consent from the author.
+4. The author retains all rights to the software.
+
+For inquiries or permission requests, please contact:  
+**[yousef.mohamad.abdala@hotmail.com](mailto:yousef.mohamad.abdala@hotmail.com)**
+
+This software is intended for personal use only. Any unauthorized use, modification, or redistribution of this software is prohibited.
