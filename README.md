@@ -22,7 +22,7 @@ To run this app on your Windows system, follow these steps:
 
 ### Steps:
 
-1. Download the latest **Battery Durability Tester** **EXE** from the [releases page](https://github.com/lordpaoloo/Battery-Durability-Tester/releases).
+1. Download the latest **Battery Durability Tester** **EXE** from the [releases page](https://github.com/lordpaoloo/BatteryDurabilityTester/releases).
    
 2. Extract the ZIP file (if applicable).
 
