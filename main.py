@@ -2,11 +2,19 @@ import sys
 import os
 import time
 import psutil
+import ctypes
 import cv2
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QImage, QPixmap, QFont, QIcon
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton
 
+def prevent_sleep():
+    """Prevent screen sleep on Windows."""
+    if sys.platform == "win32":
+        ctypes.windll.kernel32.SetThreadExecutionState(0x80000002)  # ES_SYSTEM_REQUIRED
+    else:
+        # For Linux or macOS, we can use psutil or other methods to prevent sleep.
+        pass
 
 def resource_path(relative_path):
     """Helper function to access resources in PyInstaller bundled app."""
@@ -21,7 +29,10 @@ class BatteryTestApp(QMainWindow):
     def __init__(self, video_file):
         super().__init__()
         self.setWindowTitle('Battery Duration Test')
-
+        self.time = QTimer(self)  # Initialize QTimer
+        self.time.timeout.connect(self.save_battery_report)  # Connect the timeout signal to the method
+        self.time.start(1000)  # Set timer to 5 minutes (300,000 ms)
+  # 5 minutes in milliseconds
         # Set application icon
         icon_path = resource_path("icon.ico")
         self.setWindowIcon(QIcon(icon_path))
@@ -45,7 +56,14 @@ class BatteryTestApp(QMainWindow):
         self.battery_label.setAlignment(Qt.AlignCenter)
         self.battery_label.setFont(font)
         self.battery_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 0.6);")
-        self.battery_label.setGeometry(10, 300, 300, 50)  # Initial size, adjusted dynamically
+        self.battery_label.setGeometry(10, 70, 300, 50)  # Initial size, adjusted dynamically
+
+        # Exit button (Smaller and on the side)
+        self.exit_button = QPushButton('Exit', self)
+        self.exit_button.setFont(font)
+        self.exit_button.setStyleSheet("background-color: red; color: white; padding: 5px 10px;")
+        self.exit_button.setGeometry(self.width() - 110, self.height() - 70, 100, 40)  # Position to the side
+        self.exit_button.clicked.connect(self.close_app)
 
         # Load video
         self.cap = cv2.VideoCapture(resource_path(video_file))
@@ -58,17 +76,21 @@ class BatteryTestApp(QMainWindow):
         self.video_timer.timeout.connect(self.update_frame)
         self.video_timer.start(30)
 
+        # Battery and log timers
         self.battery_timer = QTimer(self)
         self.battery_timer.timeout.connect(self.update_battery_status)
         self.battery_timer.start(1000)  # Updates every second
 
-        self.log_timer = QTimer(self)
-        self.log_timer.timeout.connect(self.save_battery_report)
-        self.log_timer.start(5 * 60 * 1000)  # Save log every 5 minutes
-
         # Stopwatch variables
         self.start_time = time.time()
+        self.elapsed_time = 0
         self.update_timer_label()
+
+        # Prevent sleep
+        prevent_sleep()
+
+        # Battery log state
+        self.last_logged_time = time.time()  # Time of last log
 
     def update_frame(self):
         """Update video frames."""
@@ -105,12 +127,11 @@ class BatteryTestApp(QMainWindow):
         if battery:
             percent = battery.percent
             status = 'Charging' if battery.power_plugged else 'Discharging'
-
             elapsed_time = time.time() - self.start_time
             hours, remainder = divmod(int(elapsed_time), 3600)
             minutes, seconds = divmod(remainder, 60)
             elapsed_time_str = f"{hours:02}:{minutes:02}:{seconds:02}"
-
+            print(report_line)
             report_line = f"{elapsed_time_str} - Battery: {percent}% - {status}\n"
             file_path = os.path.join(os.path.expanduser("~"), "Desktop", "Battery Report.txt")
             with open(file_path, "a") as f:
@@ -118,11 +139,15 @@ class BatteryTestApp(QMainWindow):
 
     def update_timer_label(self):
         """Update the stopwatch timer label."""
-        elapsed_time = time.time() - self.start_time
-        hours, remainder = divmod(int(elapsed_time), 3600)
+        self.elapsed_time = time.time() - self.start_time
+        hours, remainder = divmod(int(self.elapsed_time), 3600)
         minutes, seconds = divmod(remainder, 60)
         self.timer_label.setText(f"Time: {hours:02}:{minutes:02}:{seconds:02}")
         QTimer.singleShot(1000, self.update_timer_label)
+
+    def close_app(self):
+        """Method to close the app when the Exit button is clicked."""
+        self.close()
 
     def resizeEvent(self, event):
         """Resize event handler to adjust the labels' positions."""
@@ -137,6 +162,8 @@ class BatteryTestApp(QMainWindow):
         self.timer_label.setGeometry(
             (self.width() - label_width) // 2, self.height() - label_height - bottom_offset, label_width, label_height
         )
+        # Adjust exit button's position on the side
+        self.exit_button.setGeometry(self.width() - 110, self.height() - 70, 100, 40)
         event.accept()
 
 
