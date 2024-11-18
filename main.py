@@ -2,18 +2,43 @@ import sys
 import os
 import time
 import psutil
+import win32.win32gui
+import wmi
+import win32
 import ctypes
 import cv2
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QImage, QPixmap, QFont, QIcon
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton
 
+import ctypes
+import sys
+
+def set_brightness(brightness_percentage):
+    """Set screen brightness on Windows using WMI."""
+    if sys.platform == "win32":
+        if not (0 <= brightness_percentage <= 100):
+            print("Error: Brightness percentage must be between 0 and 100.")
+            return
+        
+        w = wmi.WMI(namespace='wmi')
+
+        try:
+            for monitor in w.WmiMonitorBrightnessMethods():
+                monitor.WmiSetBrightness(Brightness=brightness_percentage, Timeout=1)
+                print(f"Brightness set to {brightness_percentage}%")
+                return
+
+        except Exception as e:
+            print(f"Error: {e}")
+    else:
+        print("This function is only supported on Windows.")
 def prevent_sleep():
     """Prevent screen sleep on Windows."""
     if sys.platform == "win32":
-        ctypes.windll.kernel32.SetThreadExecutionState(0x80000002)  # ES_SYSTEM_REQUIRED
+        ctypes.windll.kernel32.SetThreadExecutionState(0x80000002) 
     else:
-        # For Linux or macOS, we can use psutil or other methods to prevent sleep.
+
         pass
 
 def resource_path(relative_path):
@@ -29,11 +54,9 @@ class BatteryTestApp(QMainWindow):
     def __init__(self, video_file):
         super().__init__()
         self.setWindowTitle('Battery Duration Test')
-        self.time = QTimer(self)  # Initialize QTimer
-        self.time.timeout.connect(self.save_battery_report)  # Connect the timeout signal to the method
-        self.time.start(1000)  # Set timer to 5 minutes (300,000 ms)
-  # 5 minutes in milliseconds
-        # Set application icon
+        self.time = QTimer(self) 
+        self.time.timeout.connect(self.save_battery_report) 
+        self.time.start(300000)  
         icon_path = resource_path("icon.ico")
         self.setWindowIcon(QIcon(icon_path))
 
@@ -49,20 +72,20 @@ class BatteryTestApp(QMainWindow):
         font = QFont("Arial", 24, QFont.Bold)
         self.timer_label.setFont(font)
         self.timer_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 0.6);")
-        self.timer_label.setGeometry(10, 10, 300, 50)  # Initial size, adjusted dynamically
+        self.timer_label.setGeometry(10, 10, 300, 50)  
 
         # Battery label
         self.battery_label = QLabel(self.video_label)
         self.battery_label.setAlignment(Qt.AlignCenter)
         self.battery_label.setFont(font)
         self.battery_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 0.6);")
-        self.battery_label.setGeometry(10, 70, 300, 50)  # Initial size, adjusted dynamically
+        self.battery_label.setGeometry(10, 70, 300, 50)  
 
-        # Exit button (Smaller and on the side)
+        # Exit button 
         self.exit_button = QPushButton('Exit', self)
         self.exit_button.setFont(font)
         self.exit_button.setStyleSheet("background-color: red; color: white; padding: 5px 10px;")
-        self.exit_button.setGeometry(self.width() - 110, self.height() - 70, 100, 40)  # Position to the side
+        self.exit_button.setGeometry(self.width() - 110, self.height() - 70, 100, 40)  
         self.exit_button.clicked.connect(self.close_app)
 
         # Load video
@@ -79,7 +102,7 @@ class BatteryTestApp(QMainWindow):
         # Battery and log timers
         self.battery_timer = QTimer(self)
         self.battery_timer.timeout.connect(self.update_battery_status)
-        self.battery_timer.start(1000)  # Updates every second
+        self.battery_timer.start(1000)  
 
         # Stopwatch variables
         self.start_time = time.time()
@@ -90,7 +113,7 @@ class BatteryTestApp(QMainWindow):
         prevent_sleep()
 
         # Battery log state
-        self.last_logged_time = time.time()  # Time of last log
+        self.last_logged_time = time.time()  
 
     def update_frame(self):
         """Update video frames."""
@@ -117,9 +140,9 @@ class BatteryTestApp(QMainWindow):
         if battery:
             percent = battery.percent
             status = 'Charging' if battery.power_plugged else 'Discharging'
-            self.battery_label.setText(f"Battery: {percent}% - {status}")
+            self.battery_label.setText(f"{percent}%")
         else:
-            self.battery_label.setText("Battery: Not Available")
+            self.battery_label.setText("Not Available")
 
     def save_battery_report(self):
         """Save battery status log to a file."""
@@ -131,7 +154,6 @@ class BatteryTestApp(QMainWindow):
             hours, remainder = divmod(int(elapsed_time), 3600)
             minutes, seconds = divmod(remainder, 60)
             elapsed_time_str = f"{hours:02}:{minutes:02}:{seconds:02}"
-            print(report_line)
             report_line = f"{elapsed_time_str} - Battery: {percent}% - {status}\n"
             file_path = os.path.join(os.path.expanduser("~"), "Desktop", "Battery Report.txt")
             with open(file_path, "a") as f:
@@ -162,14 +184,15 @@ class BatteryTestApp(QMainWindow):
         self.timer_label.setGeometry(
             (self.width() - label_width) // 2, self.height() - label_height - bottom_offset, label_width, label_height
         )
-        # Adjust exit button's position on the side
+        
         self.exit_button.setGeometry(self.width() - 110, self.height() - 70, 100, 40)
         event.accept()
 
 
 if __name__ == "__main__":
+    set_brightness(100)
     app = QApplication(sys.argv)
-    video_file = "test.mp4"  # Name of the video file
+    video_file = "test.mp4"  
     player = BatteryTestApp(video_file)
     player.showFullScreen()
     sys.exit(app.exec_())
