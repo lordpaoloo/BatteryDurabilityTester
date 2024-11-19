@@ -10,7 +10,7 @@ import cv2
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QImage, QPixmap, QFont, QIcon
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton
-
+import subprocess
 import ctypes
 import sys
 
@@ -40,6 +40,30 @@ def prevent_sleep():
     else:
 
         pass
+def disable_sleep_mode(self):
+    try:
+            # Set sleep mode to "Never" and disable screen turn-off
+            subprocess.run(["powercfg", "/change", "standby-timeout-ac", "0"], check=True)
+            subprocess.run(["powercfg", "/change", "standby-timeout-dc", "0"], check=True)
+            subprocess.run(["powercfg", "/change", "monitor-timeout-ac", "0"], check=True)
+            subprocess.run(["powercfg", "/change", "monitor-timeout-dc", "0"], check=True)
+            self.status_label.setText("Current Settings: Sleep Disabled")
+            self.status_label.setStyleSheet("font-size: 16px; color: red;")
+    except Exception as e:
+            self.status_label.setText(f"Error: {str(e)}")
+            self.status_label.setStyleSheet("font-size: 16px; color: red;")
+def enable_sleep_mode(self):
+        try:
+            # Restore default settings (e.g., 30 minutes for AC and 15 minutes for DC)
+            subprocess.run(["powercfg", "/change", "standby-timeout-ac", "30"], check=True)
+            subprocess.run(["powercfg", "/change", "standby-timeout-dc", "15"], check=True)
+            subprocess.run(["powercfg", "/change", "monitor-timeout-ac", "10"], check=True)
+            subprocess.run(["powercfg", "/change", "monitor-timeout-dc", "5"], check=True)
+            self.status_label.setText("Current Settings: Default Restored")
+            self.status_label.setStyleSheet("font-size: 16px; color: green;")
+        except Exception as e:
+            self.status_label.setText(f"Error: {str(e)}")
+            self.status_label.setStyleSheet("font-size: 16px; color: red;")
 
 def resource_path(relative_path):
     """Helper function to access resources in PyInstaller bundled app."""
@@ -56,7 +80,7 @@ class BatteryTestApp(QMainWindow):
         self.setWindowTitle('Battery Duration Test')
         self.time = QTimer(self) 
         self.time.timeout.connect(self.save_battery_report) 
-        self.time.start(300000)  
+        self.time.start(120000)  #that's mean 2 min
         icon_path = resource_path("icon.ico")
         self.setWindowIcon(QIcon(icon_path))
 
@@ -169,6 +193,7 @@ class BatteryTestApp(QMainWindow):
 
     def close_app(self):
         """Method to close the app when the Exit button is clicked."""
+        enable_sleep_mode()
         self.close()
 
     def resizeEvent(self, event):
@@ -190,6 +215,7 @@ class BatteryTestApp(QMainWindow):
 
 
 if __name__ == "__main__":
+    disable_sleep_mode()
     set_brightness(100)
     app = QApplication(sys.argv)
     video_file = "test.mp4"  
