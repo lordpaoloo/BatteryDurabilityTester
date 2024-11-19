@@ -10,7 +10,7 @@
 
 - **Real-time Battery Monitoring**: Tracks battery percentage, charging status, and estimated time left.
 - **Continuous Load Simulation**: Plays a video to simulate continuous load on the system, providing real-world battery testing conditions.
-- **Periodic Reporting**: Automatically generates battery reports every 5 minutes.
+- **Periodic Reporting**: Automatically generates battery reports every 2 minutes.
 - **Customizable**: Track the battery performance under any video playback, adjust for different screen brightness levels.
 - **Easy to Use**: Simple GUI that displays essential battery and time information, integrated with a video player for testing.
 
