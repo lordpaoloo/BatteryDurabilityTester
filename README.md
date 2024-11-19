@@ -34,7 +34,7 @@ To run this app on your Windows system, follow these steps:
 
 1. **Choose a Video File**: The app will begin by playing a video to simulate battery consumption.
 2. **Monitor Battery Performance**: The app will track and display battery data including percentage, status, and time remaining.
-3. **Generate Reports**: Every  minutes, a new report will be saved to `Battery Report.txt` in your desktop, providing detailed data about battery status over time.
+3. **Generate Reports**: Every 2 minutes, a new report will be saved to `Battery Report.txt` in your desktop, providing detailed data about battery status over time.
 
 ---
 
