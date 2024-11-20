@@ -10,7 +10,7 @@
 
 - **Real-time Battery Monitoring**: Tracks battery percentage, charging status, and estimated time left.
 - **Continuous Load Simulation**: Plays a video to simulate continuous load on the system, providing real-world battery testing conditions.
-- **Periodic Reporting**: Automatically generates battery reports every 5 minutes.
+- **Periodic Reporting**: Automatically generates battery reports every 2 minutes.
 - **Customizable**: Track the battery performance under any video playback, adjust for different screen brightness levels.
 - **Easy to Use**: Simple GUI that displays essential battery and time information, integrated with a video player for testing.
 
@@ -34,7 +34,7 @@ To run this app on your Windows system, follow these steps:
 
 1. **Choose a Video File**: The app will begin by playing a video to simulate battery consumption.
 2. **Monitor Battery Performance**: The app will track and display battery data including percentage, status, and time remaining.
-3. **Generate Reports**: Every 5 minutes, a new report will be saved to `battery_report.txt`, providing detailed data about battery status over time.
+3. **Generate Reports**: Every 2 minutes, a new report will be saved to `Battery Report.txt` in your desktop, providing detailed data about battery status over time.
 
 ---
 
