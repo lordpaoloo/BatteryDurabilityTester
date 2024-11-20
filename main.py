@@ -40,7 +40,7 @@ def prevent_sleep():
     else:
 
         pass
-def disable_sleep_mode(self):
+def disable_sleep_mode():
     try:
             # Set sleep mode to "Never" and disable screen turn-off
             subprocess.run(["powercfg", "/change", "standby-timeout-ac", "0"], check=True)
@@ -52,7 +52,7 @@ def disable_sleep_mode(self):
     except Exception as e:
             self.status_label.setText(f"Error: {str(e)}")
             self.status_label.setStyleSheet("font-size: 16px; color: red;")
-def enable_sleep_mode(self):
+def enable_sleep_mode():
         try:
             # Restore default settings (e.g., 30 minutes for AC and 15 minutes for DC)
             subprocess.run(["powercfg", "/change", "standby-timeout-ac", "30"], check=True)
