@@ -2,17 +2,13 @@ import sys
 import os
 import time
 import psutil
-import win32.win32gui
 import wmi
-import win32
 import ctypes
 import cv2
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QImage, QPixmap, QFont, QIcon
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton
 import subprocess
-import ctypes
-import sys
 
 def set_brightness(brightness_percentage):
     """Set screen brightness on Windows using WMI."""
@@ -33,37 +29,35 @@ def set_brightness(brightness_percentage):
             print(f"Error: {e}")
     else:
         print("This function is only supported on Windows.")
+
 def prevent_sleep():
     """Prevent screen sleep on Windows."""
     if sys.platform == "win32":
         ctypes.windll.kernel32.SetThreadExecutionState(0x80000002) 
     else:
-
         pass
+
 def disable_sleep_mode():
     try:
-            # Set sleep mode to "Never" and disable screen turn-off
-            subprocess.run(["powercfg", "/change", "standby-timeout-ac", "0"], check=True)
-            subprocess.run(["powercfg", "/change", "standby-timeout-dc", "0"], check=True)
-            subprocess.run(["powercfg", "/change", "monitor-timeout-ac", "0"], check=True)
-            subprocess.run(["powercfg", "/change", "monitor-timeout-dc", "0"], check=True)
-            self.status_label.setText("Current Settings: Sleep Disabled")
-            self.status_label.setStyleSheet("font-size: 16px; color: red;")
+        # Set sleep mode to "Never" and disable screen turn-off
+        subprocess.run(["powercfg", "/change", "standby-timeout-ac", "0"], check=True)
+        subprocess.run(["powercfg", "/change", "standby-timeout-dc", "0"], check=True)
+        subprocess.run(["powercfg", "/change", "monitor-timeout-ac", "0"], check=True)
+        subprocess.run(["powercfg", "/change", "monitor-timeout-dc", "0"], check=True)
+        print("Current Settings: Sleep Disabled")
     except Exception as e:
-            self.status_label.setText(f"Error: {str(e)}")
-            self.status_label.setStyleSheet("font-size: 16px; color: red;")
+        print(f"Error: {str(e)}")
+
 def enable_sleep_mode():
-        try:
-            # Restore default settings (e.g., 30 minutes for AC and 15 minutes for DC)
-            subprocess.run(["powercfg", "/change", "standby-timeout-ac", "30"], check=True)
-            subprocess.run(["powercfg", "/change", "standby-timeout-dc", "15"], check=True)
-            subprocess.run(["powercfg", "/change", "monitor-timeout-ac", "10"], check=True)
-            subprocess.run(["powercfg", "/change", "monitor-timeout-dc", "5"], check=True)
-            self.status_label.setText("Current Settings: Default Restored")
-            self.status_label.setStyleSheet("font-size: 16px; color: green;")
-        except Exception as e:
-            self.status_label.setText(f"Error: {str(e)}")
-            self.status_label.setStyleSheet("font-size: 16px; color: red;")
+    try:
+        # Restore default settings (e.g., 30 minutes for AC and 15 minutes for DC)
+        subprocess.run(["powercfg", "/change", "standby-timeout-ac", "30"], check=True)
+        subprocess.run(["powercfg", "/change", "standby-timeout-dc", "15"], check=True)
+        subprocess.run(["powercfg", "/change", "monitor-timeout-ac", "10"], check=True)
+        subprocess.run(["powercfg", "/change", "monitor-timeout-dc", "5"], check=True)
+        print("Current Settings: Default Restored")
+    except Exception as e:
+        print(f"Error: {str(e)}")
 
 def resource_path(relative_path):
     """Helper function to access resources in PyInstaller bundled app."""
@@ -80,7 +74,7 @@ class BatteryTestApp(QMainWindow):
         self.setWindowTitle('Battery Duration Test')
         self.time = QTimer(self) 
         self.time.timeout.connect(self.save_battery_report) 
-        self.time.start(120000)  #that's mean 2 min
+        self.time.start(120000)  # that's mean 2 min
         icon_path = resource_path("icon.ico")
         self.setWindowIcon(QIcon(icon_path))
 
@@ -105,11 +99,18 @@ class BatteryTestApp(QMainWindow):
         self.battery_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 0.6);")
         self.battery_label.setGeometry(10, 70, 300, 50)  
 
+        # Credits label
+        self.credits_label = QLabel(self.video_label)
+        #self.credits_label.setAlignment(Qt.AlignRight)
+        self.credits_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 0.6); padding: 5px;")
+        self.credits_label.setText("Developer : Yousef Mohamad Abdallah\n"
+                                   "GitHub    : https://github.com/lordpaoloo\n"
+                                   "Email     : yousef.mohamad.abdallah@outlook.com")
+
         # Exit button 
         self.exit_button = QPushButton('Exit', self)
         self.exit_button.setFont(font)
         self.exit_button.setStyleSheet("background-color: red; color: white; padding: 5px 10px;")
-        self.exit_button.setGeometry(self.width() - 110, self.height() - 70, 100, 40)  
         self.exit_button.clicked.connect(self.close_app)
 
         # Load video
@@ -182,6 +183,17 @@ class BatteryTestApp(QMainWindow):
             file_path = os.path.join(os.path.expanduser("~"), "Desktop", "Battery Report.txt")
             with open(file_path, "a") as f:
                 f.write(report_line)
+        else:
+            percent = "there is no battery"
+            status = "plugged in "
+            elapsed_time = time.time() - self.start_time
+            hours, remainder = divmod(int(elapsed_time), 3600)
+            minutes, seconds = divmod(remainder, 60)
+            elapsed_time_str = f"{hours:02}:{minutes:02}:{seconds:02}"
+            report_line = f"{elapsed_time_str} - Battery: {percent}% - {status}\n"
+            file_path = os.path.join(os.path.expanduser("~"), "Desktop", "Battery Report.txt")
+            with open(file_path, "a") as f:
+                f.write(report_line)
 
     def update_timer_label(self):
         """Update the stopwatch timer label."""
@@ -199,26 +211,34 @@ class BatteryTestApp(QMainWindow):
     def resizeEvent(self, event):
         """Resize event handler to adjust the labels' positions."""
         self.video_label.resize(self.width(), self.height())
-        # Place labels at the bottom
+        
         label_width = 300
         label_height = 50
         bottom_offset = 10
+        
+        # Adjust label positions
         self.battery_label.setGeometry(
             (self.width() - label_width) // 2, self.height() - label_height * 2 - bottom_offset, label_width, label_height
         )
         self.timer_label.setGeometry(
             (self.width() - label_width) // 2, self.height() - label_height - bottom_offset, label_width, label_height
         )
-        
+        self.credits_label.setGeometry(10, 10, 400, 70)  # Dynamically adjusts text content
+
         self.exit_button.setGeometry(self.width() - 110, self.height() - 70, 100, 40)
         event.accept()
 
 
 if __name__ == "__main__":
+    
     disable_sleep_mode()
     set_brightness(100)
+
     app = QApplication(sys.argv)
-    video_file = "test.mp4"  
-    player = BatteryTestApp(video_file)
-    player.showFullScreen()
+    app.setStyle("Fusion")
+
+    video_file = "test.mp4"
+    app_window = BatteryTestApp(video_file)
+    app_window.showFullScreen()
+    
     sys.exit(app.exec_())

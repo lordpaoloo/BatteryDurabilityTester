@@ -50,7 +50,7 @@ To run this app on your Windows system, follow these steps:
 
 For any questions, suggestions, or issues, feel free to reach out:
 
-- **Email**: [yousef.mohamad.abdala@hotmail.com](mailto:yousef.mohamad.abdala@hotmail.com)
+- **Email**: [yousef.mohamad.abdala@hotmail.com](mailto:yousef.mohamad.abdallah@outlook.com)
 
 ---
 
